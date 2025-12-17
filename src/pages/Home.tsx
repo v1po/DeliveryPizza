@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,9 +16,42 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const isMounted = React.useRef(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
 
   const { items, status } = useSelector(selectPizzaData);
   const { categoryId, sort, currentPage, searchValue } = useSelector(selectFilter);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    const token = localStorage.getItem('access_token');
+    
+    if (userData && token) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUserInfo(parsedUser);
+
+        const registrationTime = localStorage.getItem('registration_time');
+        
+        if (registrationTime && 
+            (Date.now() - parseInt(registrationTime)) < 10000 && 
+            !hasShownWelcome &&
+            parsedUser?.first_name) {
+          
+          setTimeout(() => {
+            alert(`🎉 Добро пожаловать, ${parsedUser.first_name}!\n\nВаш аккаунт успешно создан. Приятных покупок!`);
+            setHasShownWelcome(true);
+          }, 500); 
+          
+          setTimeout(() => {
+            localStorage.removeItem('registration_time');
+          }, 10000);
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+  }, [hasShownWelcome]);
 
   const onChangeCategory = React.useCallback((idx: number) => {
     dispatch(setCategoryId(idx));
@@ -51,13 +84,36 @@ const Home: React.FC = () => {
     getPizzas();
   }, [categoryId, sort.sortProperty, searchValue, currentPage]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('registration_time');
+    setUserInfo(null);
+    setHasShownWelcome(false);
+    navigate('/');
+  };
 
   const pizzas = items.map((obj: any) => <PizzaBlock key={obj.id} {...obj} />);
   const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
 
   return (
     <div className="container">
-      <TitlePage/>
+      {userInfo && (
+        <div className="user-info-panel">
+          <div className="user-info-content">
+            <div className="user-greeting">
+              <span>👋 Привет, {userInfo.first_name}!</span>
+              <span className="user-email">{userInfo.email}</span>
+            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              Выйти
+            </button>
+          </div>
+        </div>
+      )}
+
+      <TitlePage />
       <div className="content__top">
         <Categories value={categoryId} onChangeCategory={onChangeCategory} />
         <Sort value={sort} />

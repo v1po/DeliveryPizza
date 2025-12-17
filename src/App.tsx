@@ -8,15 +8,11 @@ import Home from './pages/Home';
 import './scss/app.scss';
 import MainLayout from './layouts/MainLayout';
 
-const Cart = Loadable({
-  loader: () => import(/* webpackChunkName: "Cart" */ './pages/Cart'),
-  loading: () => <div>Идёт загрузка корзины...</div>,
-});
-
+const Cart = React.lazy(() => import(/* webpackChunkName: "Cart" */ './pages/Cart'));
 const FullPizza = React.lazy(() => import(/* webpackChunkName: "FullPizza" */ './pages/FullPizza'));
 const NotFound = React.lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/NotFound'));
-const Auth = React.lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/auth'));
-const SignUp = React.lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/SignUp'));
+const Auth = React.lazy(() => import(/* webpackChunkName: "Auth" */ './pages/auth'));
+const SignUp = React.lazy(() => import(/* webpackChunkName: "SignUp" */ './pages/SignUp'));
 
 function App() {
   return (

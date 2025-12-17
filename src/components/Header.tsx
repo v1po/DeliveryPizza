@@ -12,6 +12,7 @@ export const Header: React.FC = () => {
   const isMounted = React.useRef(false);
 
   const totalCount = items.reduce((sum: number, item: any) => sum + item.count, 0);
+  const isAuthenticated = !!localStorage.getItem('access_token');
 
   React.useEffect(() => {
     if (isMounted.current) {
@@ -71,7 +72,7 @@ export const Header: React.FC = () => {
             </Link>
           )}
         </div>
-        {( location.pathname !== '/cart' && location.pathname !== '/auth'&& location.pathname !== '/signup' ) && <Link to='/auth'>
+        {( location.pathname !== '/cart' && location.pathname !== '/auth'&& location.pathname !== '/signup' && isAuthenticated === false) && <Link to='/auth'>
         <button className='button__auth' >Войти</button></Link>}
 
       </div>
