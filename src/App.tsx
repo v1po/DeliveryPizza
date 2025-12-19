@@ -3,8 +3,6 @@ import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import Home from './pages/Home';
-
-
 import './scss/app.scss';
 import MainLayout from './layouts/MainLayout';
 
@@ -13,11 +11,14 @@ const FullPizza = React.lazy(() => import(/* webpackChunkName: "FullPizza" */ '.
 const NotFound = React.lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/NotFound'));
 const Auth = React.lazy(() => import(/* webpackChunkName: "Auth" */ './pages/auth'));
 const SignUp = React.lazy(() => import(/* webpackChunkName: "SignUp" */ './pages/SignUp'));
+const RegisterOrder = React.lazy(() => import(/* webpackChunkName: "RegisterOrder" */ './pages/RegisterOrder/order'));
+const OrderSuccess = React.lazy(() => import(/* webpackChunkName: "OrderSuccess" */ './pages/RegisterOrder/orderSuccess'));
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
+        {/* Основные маршруты */}
         <Route path="" element={<Home />} />
         <Route
           path="cart"
@@ -35,14 +36,26 @@ function App() {
             </Suspense>
           }
         />
+        
+        {/* Маршруты оформления заказа */}
         <Route
-          path="*"
+          path="checkout"
           element={
-            <Suspense fallback={<div>Идёт загрузка...</div>}>
-              <NotFound />
+            <Suspense fallback={<div>Загружаем страницу оформления...</div>}>
+              <RegisterOrder />
             </Suspense>
           }
         />
+        <Route
+          path="order-success"
+          element={
+            <Suspense fallback={<div>Загружаем...</div>}>
+              <OrderSuccess />
+            </Suspense>
+          }
+        />
+        
+        {/* Аутентификация */}
         <Route
           path="auth"
           element={
@@ -56,6 +69,16 @@ function App() {
           element={
             <Suspense fallback={<div>Идёт загрузка...</div>}>
               <SignUp />
+            </Suspense>
+          }
+        />
+        
+        {/* 404 */}
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<div>Идёт загрузка...</div>}>
+              <NotFound />
             </Suspense>
           }
         />
