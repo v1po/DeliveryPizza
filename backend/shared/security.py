@@ -1,6 +1,4 @@
-"""
-Security utilities for JWT handling and password hashing.
-"""
+
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -11,8 +9,6 @@ from .schemas import TokenPayload, UserRole
 
 
 class SecurityManager:
-    """JWT and password security manager."""
-    
     def __init__(
         self,
         secret_key: str,
@@ -47,7 +43,6 @@ class SecurityManager:
         email: str,
         role: UserRole,
     ) -> str:
-        """Create JWT access token."""
         now = datetime.now(timezone.utc)
         expire = now + timedelta(minutes=self.access_token_expire_minutes)
         
@@ -67,7 +62,6 @@ class SecurityManager:
         email: str,
         role: UserRole,
     ) -> str:
-        """Create JWT refresh token."""
         now = datetime.now(timezone.utc)
         expire = now + timedelta(days=self.refresh_token_expire_days)
         
@@ -82,7 +76,6 @@ class SecurityManager:
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
     
     def decode_token(self, token: str) -> TokenPayload | None:
-        """Decode and validate JWT token."""
         try:
             payload = jwt.decode(
                 token,
@@ -106,7 +99,6 @@ class SecurityManager:
         email: str,
         role: UserRole,
     ) -> tuple[str, str]:
-        """Create access and refresh token pair."""
         access_token = self.create_access_token(user_id, email, role)
         refresh_token = self.create_refresh_token(user_id, email, role)
         return access_token, refresh_token

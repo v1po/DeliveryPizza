@@ -1,8 +1,5 @@
 version: '3.9'
 
-# Development compose - запускает только инфраструктуру
-# Сервисы запускаются локально для разработки
-
 services:
   postgres:
     image: postgres:16-alpine

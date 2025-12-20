@@ -1,6 +1,4 @@
-"""
-Catalog repository for database operations.
-"""
+
 import re
 from typing import Any
 
@@ -12,7 +10,6 @@ from .models import Category, Product, ProductModifier, ProductStatus
 
 
 def slugify(text: str) -> str:
-    """Generate slug from text."""
     text = text.lower().strip()
     text = re.sub(r'[^\w\s-]', '', text)
     text = re.sub(r'[-\s]+', '-', text)
@@ -20,13 +17,11 @@ def slugify(text: str) -> str:
 
 
 class CategoryRepository:
-    """Category database repository."""
     
     def __init__(self, session: AsyncSession):
         self.session = session
     
     async def create(self, **kwargs) -> Category:
-        """Create new category."""
         if not kwargs.get("slug"):
             kwargs["slug"] = slugify(kwargs["name"])
         
@@ -37,7 +32,6 @@ class CategoryRepository:
         return category
     
     async def get_by_id(self, category_id: int) -> Category | None:
-        """Get category by ID."""
         result = await self.session.execute(
             select(Category)
             .options(selectinload(Category.children))
@@ -46,7 +40,6 @@ class CategoryRepository:
         return result.scalar_one_or_none()
     
     async def get_by_slug(self, slug: str) -> Category | None:
-        """Get category by slug."""
         result = await self.session.execute(
             select(Category).where(Category.slug == slug)
         )
@@ -57,7 +50,6 @@ class CategoryRepository:
         active_only: bool = True,
         parent_id: int | None = None,
     ) -> list[Category]:
-        """Get all categories."""
         query = select(Category).options(selectinload(Category.children))
         
         if active_only:
@@ -73,11 +65,10 @@ class CategoryRepository:
         return list(result.scalars().all())
     
     async def get_tree(self, active_only: bool = True) -> list[Category]:
-        """Get category tree with nested children."""
         return await self.get_all(active_only=active_only, parent_id=None)
     
     async def update(self, category_id: int, **kwargs) -> Category | None:
-        """Update category."""
+
         await self.session.execute(
             update(Category)
             .where(Category.id == category_id)
@@ -86,14 +77,12 @@ class CategoryRepository:
         return await self.get_by_id(category_id)
     
     async def delete(self, category_id: int) -> bool:
-        """Delete category."""
         result = await self.session.execute(
             delete(Category).where(Category.id == category_id)
         )
         return result.rowcount > 0
     
     async def count_products(self, category_id: int) -> int:
-        """Count products in category."""
         result = await self.session.execute(
             select(func.count(Product.id))
             .where(Product.category_id == category_id)
@@ -102,7 +91,6 @@ class CategoryRepository:
 
 
 class ProductRepository:
-    """Product database repository."""
     
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -112,7 +100,6 @@ class ProductRepository:
         modifiers: list[dict] | None = None,
         **kwargs,
     ) -> Product:
-        """Create new product."""
         if not kwargs.get("slug"):
             kwargs["slug"] = slugify(kwargs["name"])
         
@@ -131,7 +118,6 @@ class ProductRepository:
         return product
     
     async def get_by_id(self, product_id: int) -> Product | None:
-        """Get product by ID with modifiers."""
         result = await self.session.execute(
             select(Product)
             .options(selectinload(Product.modifiers))
@@ -140,7 +126,7 @@ class ProductRepository:
         return result.scalar_one_or_none()
     
     async def get_by_slug(self, slug: str) -> Product | None:
-        """Get product by slug."""
+
         result = await self.session.execute(
             select(Product)
             .options(selectinload(Product.modifiers))
@@ -149,7 +135,6 @@ class ProductRepository:
         return result.scalar_one_or_none()
     
     async def get_by_ids(self, product_ids: list[int]) -> list[Product]:
-        """Get products by IDs."""
         result = await self.session.execute(
             select(Product)
             .options(selectinload(Product.modifiers))
@@ -166,7 +151,6 @@ class ProductRepository:
         is_featured: bool | None = None,
         search: str | None = None,
     ) -> tuple[list[Product], int]:
-        """Get all products with filtering and pagination."""
         query = select(Product).options(selectinload(Product.modifiers))
         
         # Filters
@@ -190,7 +174,6 @@ class ProductRepository:
         total_result = await self.session.execute(count_query)
         total = total_result.scalar() or 0
         
-        # Get paginated
         query = query.offset(offset).limit(limit)
         query = query.order_by(Product.sort_order, Product.name)
         result = await self.session.execute(query)
@@ -199,7 +182,6 @@ class ProductRepository:
         return products, total
     
     async def get_featured(self, limit: int = 10) -> list[Product]:
-        """Get featured products."""
         result = await self.session.execute(
             select(Product)
             .where(
@@ -216,7 +198,6 @@ class ProductRepository:
         category_id: int,
         available_only: bool = True,
     ) -> list[Product]:
-        """Get products by category."""
         query = select(Product).where(Product.category_id == category_id)
         
         if available_only:
@@ -227,7 +208,6 @@ class ProductRepository:
         return list(result.scalars().all())
     
     async def update(self, product_id: int, **kwargs) -> Product | None:
-        """Update product."""
         await self.session.execute(
             update(Product)
             .where(Product.id == product_id)
@@ -236,7 +216,6 @@ class ProductRepository:
         return await self.get_by_id(product_id)
     
     async def delete(self, product_id: int) -> bool:
-        """Delete product."""
         result = await self.session.execute(
             delete(Product).where(Product.id == product_id)
         )
@@ -244,7 +223,7 @@ class ProductRepository:
 
 
 class ModifierRepository:
-    """Product modifier repository."""
+
     
     def __init__(self, session: AsyncSession):
         self.session = session

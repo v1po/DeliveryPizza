@@ -191,9 +191,9 @@ curl -X POST http://localhost:8000/api/v1/orders \
       {"product_id": 3, "quantity": 1}
     ],
     "delivery_type": "delivery",
-    "delivery_address": "ул. Примерная, д. 1", 
-    "contact_name": "Иван Иванов",  
-    "contact_phone": "+7999123456",  
+    "delivery_address": "ул. Примерная, д. 1",
+    "contact_name": "Иван Иванов",
+    "contact_phone": "+7999123456",
     "payment_method": "card"
   }'
 ```

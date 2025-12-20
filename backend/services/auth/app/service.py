@@ -20,7 +20,6 @@ from shared.security import SecurityManager
 
 
 class AuthService:
-    """Authentication and user management service."""
     
     def __init__(
         self,
@@ -33,7 +32,6 @@ class AuthService:
         self.redis = redis
     
     async def register(self, data: UserCreate) -> User:
-        """Register new user."""
         # Check if email already exists
         existing = await self.repository.get_by_email(data.email)
         if existing:
@@ -58,7 +56,6 @@ class AuthService:
         email: str,
         password: str,
     ) -> tuple[User, str, str]:
-        """Authenticate user and return tokens."""
         # Get user
         user = await self.repository.get_active_by_email(email)
         if not user:
@@ -84,7 +81,6 @@ class AuthService:
         self,
         refresh_token: str,
     ) -> tuple[str, str]:
-        """Refresh access token using refresh token."""
         # Check if token is blacklisted
         if await self.redis.is_token_blacklisted(refresh_token):
             raise TokenBlacklistedException()
@@ -118,23 +114,17 @@ class AuthService:
         access_token: str,
         refresh_token: str | None = None,
     ) -> None:
-        """Logout user by blacklisting tokens."""
-        # Blacklist access token
         access_expire = self.security.access_token_expire_minutes * 60
         await self.redis.blacklist_token(access_token, access_expire)
         
-        # Blacklist refresh token if provided
         if refresh_token:
             refresh_expire = self.security.refresh_token_expire_days * 24 * 60 * 60
             await self.redis.blacklist_token(refresh_token, refresh_expire)
     
     async def validate_token(self, token: str) -> User | None:
-        """Validate access token and return user."""
-        # Check blacklist
         if await self.redis.is_token_blacklisted(token):
             return None
         
-        # Decode token
         payload = self.security.decode_token(token)
         if not payload or payload.type != "access":
             return None
@@ -143,14 +133,12 @@ class AuthService:
         return await self.repository.get_by_id(payload.sub)
     
     async def get_user(self, user_id: int) -> User:
-        """Get user by ID."""
         user = await self.repository.get_by_id(user_id)
         if not user:
             raise NotFoundException("User")
         return user
     
     async def update_user(self, user_id: int, data: UserUpdate) -> User:
-        """Update user profile."""
         user = await self.repository.get_by_id(user_id)
         if not user:
             raise NotFoundException("User")
@@ -167,7 +155,6 @@ class AuthService:
         current_password: str,
         new_password: str,
     ) -> None:
-        """Change user password."""
         user = await self.repository.get_by_id(user_id)
         if not user:
             raise NotFoundException("User")
@@ -185,7 +172,6 @@ class AuthService:
         user_id: int,
         role: UserRole,
     ) -> User:
-        """Update user role (admin only)."""
         user = await self.repository.get_by_id(user_id)
         if not user:
             raise NotFoundException("User")
@@ -197,7 +183,6 @@ class AuthService:
         user_id: int,
         is_active: bool,
     ) -> User:
-        """Update user active status (admin only)."""
         user = await self.repository.get_by_id(user_id)
         if not user:
             raise NotFoundException("User")
@@ -211,7 +196,6 @@ class AuthService:
         role: UserRole | None = None,
         is_active: bool | None = None,
     ) -> tuple[list[User], int]:
-        """Get all users with pagination (admin only)."""
         return await self.repository.get_all(
             offset=offset,
             limit=limit,
