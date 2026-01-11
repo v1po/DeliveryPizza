@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { CartItem } from "../../redux/cart/types";
+import { CartItem } from "../../types/cart";
 import { useCart } from "../../hooks/useCart";
 
 const typeNames = ["тонкое", "традиционное"];

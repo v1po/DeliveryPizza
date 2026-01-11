@@ -1,7 +1,6 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { addItem, minusItem, removeItem } from '../redux/cart/slice';
-import { CartItem as CartItemType } from '../redux/cart/types';
+import { useCartContext } from '../hooks/useCartContext';
+import { CartItem as CartItemType } from '../types/cart';
 
 type CartItemProps = {
   id: string;
@@ -22,23 +21,19 @@ export const CartItem: React.FC<CartItemProps> = ({
   count,
   imageUrl,
 }) => {
-  const dispatch = useDispatch();
+  const { addItem, minusItem, removeItem } = useCartContext();
 
   const onClickPlus = () => {
-    dispatch(
-      addItem({
-        id,
-      } as CartItemType),
-    );
+    addItem({ id, title, price, imageUrl, type, size } as CartItemType);
   };
 
   const onClickMinus = () => {
-    dispatch(minusItem(id));
+    minusItem(id);
   };
 
   const onClickRemove = () => {
     if (window.confirm('Ты действительно хочешь удалить товар?')) {
-      dispatch(removeItem(id));
+      removeItem(id);
     }
   };
 

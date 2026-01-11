@@ -1,11 +1,10 @@
-import React, { Suspense, lazy } from 'react';
+import  { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import Home from './pages/Home';
 import './scss/app.scss';
 import MainLayout from './layouts/MainLayout';
 
-// Заменяем Loadable на React.lazy для всех компонентов
 const Cart = lazy(() => import(/* webpackChunkName: "Cart" */ './pages/Cart'));
 const FullPizza = lazy(() => import(/* webpackChunkName: "FullPizza" */ './pages/FullPizza'));
 const NotFound = lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/NotFound'));

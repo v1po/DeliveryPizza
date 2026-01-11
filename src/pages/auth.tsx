@@ -1,7 +1,6 @@
-import React from 'react';
 import CartAuth from '../components/CartAuth/CartAuth';
 
-const auth: React.FC = () => {
+const auth = () => {
   return(
     <div className='auth'>
       <CartAuth/>
