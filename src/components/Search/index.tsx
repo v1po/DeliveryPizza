@@ -1,25 +1,26 @@
-import React from 'react';
-import { useFilterContext } from '../../hooks/useFilterContext';
-import debounce from 'lodash.debounce';
+import React from "react";
+import { useFilterContext } from "../../hooks/useFilterContext";
+import debounce from "lodash.debounce";
+import { useState, useRef, useCallback } from "react";
 
-import styles from './Search.module.scss';
+import styles from "./Search.module.scss";
 
 export const Search = () => {
   const { setSearchValue } = useFilterContext();
-  const [value, setValue] = React.useState<string>('');
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const onClickClear = () => {
-    setSearchValue('');
-    setValue('');
+    setSearchValue("");
+    setValue("");
     inputRef.current?.focus();
   };
 
-  const updateSearchValue = React.useCallback(
+  const updateSearchValue = useCallback(
     debounce((str: string) => {
       setSearchValue(str);
     }, 150),
-    [],
+    []
   );
 
   const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +36,8 @@ export const Search = () => {
         id="EditableLine"
         version="1.1"
         viewBox="0 0 32 32"
-        xmlns="http://www.w3.org/2000/svg">
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <circle
           cx="14"
           cy="14"
@@ -74,7 +76,8 @@ export const Search = () => {
           onClick={onClickClear}
           className={styles.clearIcon}
           viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path d="M10 8.586L2.929 1.515 1.515 2.929 8.586 10l-7.071 7.071 1.414 1.414L10 11.414l7.071 7.071 1.414-1.414L11.414 10l7.071-7.071-1.414-1.414L10 8.586z" />
         </svg>
       )}

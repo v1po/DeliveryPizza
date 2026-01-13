@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { CartItem } from "../../types/cart";
-import { useCart } from "../../hooks/useCart";
+import { useCartContext } from "../../hooks/useCartContext";
+import { useState } from "react";
 
 const typeNames = ["тонкое", "традиционное"];
 
@@ -23,22 +24,21 @@ export const PizzaBlock: React.FC<PizzaBlockProps> = ({
   sizes,
   types,
 }) => {
-  const { addItem, items } = useCart();
-  const [activeType, setActiveType] = React.useState(0);
-  const [activeSize, setActiveSize] = React.useState(0);
+  const { addItem, items } = useCartContext();
+  const [activeType, setActiveType] = useState(0);
+  const [activeSize, setActiveSize] = useState(0);
 
-  const cartItem = items.find(item => item.id === id);
+  const cartItem = items.find((item) => item.id === id);
   const addedCount = cartItem ? cartItem.count : 0;
 
   const onClickAdd = () => {
-    const item: CartItem = {
+    const item: Omit<CartItem, "count"> = {
       id,
       title,
       price,
       imageUrl,
       type: typeNames[activeType],
       size: sizes[activeSize],
-      count: 0, 
     };
     addItem(item);
   };

@@ -1,15 +1,21 @@
-import  { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Suspense, lazy } from "react";
+import { Routes, Route } from "react-router-dom";
 
-import Home from './pages/Home';
-import './scss/app.scss';
-import MainLayout from './layouts/MainLayout';
+import Home from "./pages/Home";
+import "./scss/app.scss";
+import MainLayout from "./layouts/MainLayout";
 
-const Cart = lazy(() => import(/* webpackChunkName: "Cart" */ './pages/Cart'));
-const FullPizza = lazy(() => import(/* webpackChunkName: "FullPizza" */ './pages/FullPizza'));
-const NotFound = lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/NotFound'));
-const Auth = lazy(() => import(/* webpackChunkName: "Auth" */ './pages/auth'));
-const SignUp = lazy(() => import(/* webpackChunkName: "SignUp" */ './pages/SignUp'));
+const Cart = lazy(() => import(/* webpackChunkName: "Cart" */ "./pages/Cart"));
+const FullPizza = lazy(
+  () => import(/* webpackChunkName: "FullPizza" */ "./pages/FullPizza")
+);
+const NotFound = lazy(
+  () => import(/* webpackChunkName: "NotFound" */ "./pages/NotFound")
+);
+const Auth = lazy(() => import(/* webpackChunkName: "Auth" */ "./pages/auth"));
+const SignUp = lazy(
+  () => import(/* webpackChunkName: "SignUp" */ "./pages/SignUp")
+);
 
 function App() {
   return (

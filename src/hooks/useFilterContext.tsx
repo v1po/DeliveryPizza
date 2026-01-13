@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { useState, useContext } from "react";
 
 type FilterState = {
   searchValue: string;
@@ -14,20 +15,26 @@ type FilterContextType = FilterState & {
 };
 
 const defaultState: FilterState = {
-  searchValue: '',
+  searchValue: "",
   categoryId: 0,
   currentPage: 1,
 };
 
 const FilterContext = React.createContext<FilterContextType | null>(null);
 
-export const FilterProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-  const [state, setState] = React.useState<FilterState>(defaultState);
+export const FilterProvider: React.FC<React.PropsWithChildren<{}>> = ({
+  children,
+}) => {
+  const [state, setState] = useState<FilterState>(defaultState);
 
-  const setCategoryId = (id: number) => setState((s) => ({ ...s, categoryId: id }));
-  const setSearchValue = (v: string) => setState((s) => ({ ...s, searchValue: v }));
-  const setCurrentPage = (p: number) => setState((s) => ({ ...s, currentPage: p }));
-  const setFilters = (f: Partial<FilterState>) => setState((s) => ({ ...s, ...f }));
+  const setCategoryId = (id: number) =>
+    setState((s) => ({ ...s, categoryId: id }));
+  const setSearchValue = (v: string) =>
+    setState((s) => ({ ...s, searchValue: v }));
+  const setCurrentPage = (p: number) =>
+    setState((s) => ({ ...s, currentPage: p }));
+  const setFilters = (f: Partial<FilterState>) =>
+    setState((s) => ({ ...s, ...f }));
 
   const value: FilterContextType = {
     ...state,
@@ -37,11 +44,14 @@ export const FilterProvider: React.FC<React.PropsWithChildren<{}>> = ({ children
     setFilters,
   };
 
-  return <FilterContext.Provider value={value}>{children}</FilterContext.Provider>;
+  return (
+    <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
+  );
 };
 
 export const useFilterContext = (): FilterContextType => {
-  const ctx = React.useContext(FilterContext);
-  if (!ctx) throw new Error('useFilterContext must be used within FilterProvider');
+  const ctx = useContext(FilterContext);
+  if (!ctx)
+    throw new Error("useFilterContext must be used within FilterProvider");
   return ctx;
 };

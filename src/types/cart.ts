@@ -7,8 +7,3 @@ export type CartItem = {
   size: number;
   count: number;
 };
-
-export interface CartSliceState {
-  totalPrice: number;
-  items: CartItem[];
-}
