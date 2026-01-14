@@ -75,7 +75,6 @@ const CartAuth: React.FC = () => {
     }
   };
 
-  // Если успешная авторизация
   if (loginSuccess) {
     return (
       <div className="auth">

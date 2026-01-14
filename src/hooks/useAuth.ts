@@ -1,4 +1,3 @@
-// hooks/useAuth.ts
 import { useEffect, useState } from 'react';
 import { authService } from '../utils/auth';
 
@@ -10,7 +9,6 @@ export const useAuth = () => {
   useEffect(() => {
     checkAuth();
     
-    // Проверяем авторизацию при изменении токена
     const handleStorageChange = () => {
       checkAuth();
     };

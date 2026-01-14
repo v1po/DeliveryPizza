@@ -18,7 +18,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
-        {/* Основные маршруты */}
         <Route path="" element={<Home />} />
         <Route
           path="cart"
@@ -37,7 +36,6 @@ function App() {
           }
         />
         
-        {/* Маршруты оформления заказа */}
         <Route
           path="checkout"
           element={
@@ -55,7 +53,6 @@ function App() {
           }
         />
         
-        {/* Аутентификация */}
         <Route
           path="auth"
           element={
@@ -73,7 +70,6 @@ function App() {
           }
         />
         
-        {/* 404 */}
         <Route
           path="*"
           element={

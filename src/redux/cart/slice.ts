@@ -1,4 +1,3 @@
-// redux/cart/slice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CartItem {
@@ -27,7 +26,6 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    // Добавление товара
     addItem(state, action: PayloadAction<CartItem>) {
       const findItem = state.items.find(obj => obj.id === action.payload.id);
       
@@ -49,7 +47,6 @@ const cartSlice = createSlice({
       }, 0);
     },
     
-    // Увеличение количества (plusItem)
     plusItem(state, action: PayloadAction<string>) {
       const findItem = state.items.find(obj => obj.id === action.payload);
       if (findItem) {
@@ -63,7 +60,6 @@ const cartSlice = createSlice({
       }
     },
     
-    // Уменьшение количества (minusItem)
     minusItem(state, action: PayloadAction<string>) {
       const findItem = state.items.find(obj => obj.id === action.payload);
       if (findItem && findItem.count > 1) {
@@ -77,7 +73,6 @@ const cartSlice = createSlice({
       }
     },
     
-    // Удаление товара (removeItem)
     removeItem(state, action: PayloadAction<string>) {
       state.items = state.items.filter(obj => obj.id !== action.payload);
       state.totalPrice = state.items.reduce((sum, obj) => {
@@ -88,7 +83,6 @@ const cartSlice = createSlice({
       }, 0);
     },
     
-    // Очистка корзины
     clearItems(state) {
       state.items = [];
       state.totalPrice = 0;
@@ -97,7 +91,6 @@ const cartSlice = createSlice({
   },
 });
 
-// ВАЖНО: экспортируй ВСЕ actions которые используешь
 export const { 
   addItem, 
   plusItem, 

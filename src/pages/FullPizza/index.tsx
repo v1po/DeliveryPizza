@@ -25,14 +25,13 @@ const FullPizza: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  // Получаем данные этой пиццы из корзины Redux
   const cartItem = useSelector(selectCartItemById(id || ''));
   const addedCount = cartItem ? cartItem.count : 0;
 
   useEffect(() => {
     async function fetchPizza() {
       try {
-        const { data } = await axios.get(`https://690a6a8d1a446bb9cc2283e3.mockapi.io/items/${id}`);
+        const { data } = await axios.get(`https://690a6a8d1a446bb9cc2283e3.mockapi.io/items?id=${id}`);
         setPizza(data);
       } catch (error) {
         console.error('Ошибка при получении пиццы:', error);
@@ -86,8 +85,6 @@ const FullPizza: React.FC = () => {
         
         <div className="full-pizza__info">
           <h2 className="full-pizza__title">{pizza.title}</h2>
-          
-          {/* Селектор типа теста */}
           {pizza.types && pizza.types.length > 0 && (
             <div className="full-pizza__selector">
               <h4>Выберите тесто:</h4>
@@ -104,8 +101,6 @@ const FullPizza: React.FC = () => {
               </ul>
             </div>
           )}
-          
-          {/* Селектор размера */}
           {pizza.sizes && pizza.sizes.length > 0 && (
             <div className="full-pizza__selector">
               <h4>Выберите размер:</h4>

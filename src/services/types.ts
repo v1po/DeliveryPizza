@@ -42,7 +42,7 @@ export interface Order {
 
 export interface CreateOrderRequest {
   items: Array<{
-    product_id: string;  // должно быть string (если ID строковые)
+    product_id: string;  
     quantity: number;
   }>;
   delivery_type: 'delivery' | 'pickup';  

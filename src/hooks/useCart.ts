@@ -8,7 +8,7 @@ interface CartState {
 }
 
 export const useCart = () => {
-  // Загружаем корзину из localStorage при инициализации
+  
   const loadCartFromStorage = (): CartState => {
     if (typeof window === 'undefined') {
       return { items: [], totalPrice: 0, totalCount: 0 };
@@ -18,7 +18,6 @@ export const useCart = () => {
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart);
-        // Проверяем корректность структуры
         return {
           items: Array.isArray(parsed.items) ? parsed.items : [],
           totalPrice: typeof parsed.totalPrice === 'number' ? parsed.totalPrice : 0,
@@ -34,7 +33,6 @@ export const useCart = () => {
 
   const [cart, setCart] = useState<CartState>(loadCartFromStorage);
 
-  // Сохраняем корзину в localStorage при каждом изменении
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
@@ -110,7 +108,6 @@ export const useCart = () => {
     setCart({ items: [], totalPrice: 0, totalCount: 0 });
   }, []);
 
-  // Возвращаем гарантированно массив
   return {
     items: Array.isArray(cart.items) ? cart.items : [],
     totalPrice: typeof cart.totalPrice === 'number' ? cart.totalPrice : 0,

@@ -196,7 +196,6 @@ const Cart: React.FC = () => {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* SVG path */}
               </svg>
               Корзина
             </h2>
@@ -204,7 +203,7 @@ const Cart: React.FC = () => {
           
           <div className="content__items">
             {items.map((item: any) => (
-              <CartItem key={item.id} {...item} />
+              <CartItem key={`${item.id}_${item.type}_${item.size}`} {...item} />
             ))}
           </div>
           
@@ -219,7 +218,7 @@ const Cart: React.FC = () => {
             </div>
             
             <div className="cart__auth-required">
-              <p>Для оформления заказа требуется авторизация</p>
+              <p className="cart__text">Для оформления заказа требуется авторизация</p>
               <div className="cart__auth-buttons">
                 <Link to="/auth" className="button button--outline">
                   <span>Войти</span>
@@ -331,7 +330,7 @@ const Cart: React.FC = () => {
           
           <div className="content__items">
             {items.map((item: any) => (
-              <CartItem key={item.id} {...item} />
+              <CartItem key={`${item.id}_${item.type}_${item.size}`} {...item} />
             ))}
           </div>
           
@@ -381,7 +380,6 @@ const Cart: React.FC = () => {
         </div>
       </div>
 
-      {/* Модальное окно оформления заказа */}
       {showForm && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -489,8 +487,6 @@ const Cart: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Модальное окно успешного оформления */}
       {showSuccessModal && (
         <div className="modal-overlay success-overlay">
           <div className="modal-content success-content">
