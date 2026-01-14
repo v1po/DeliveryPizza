@@ -24,3 +24,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files (dotenv and env folder)
+.env.local
+env
+env/
