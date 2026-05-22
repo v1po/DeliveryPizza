@@ -1,0 +1,71 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Python test
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+.vite/
+.vitepress/
+dist/
+build/
+
+# Environment variables
+.env
+.env.*
+
+# IDE/editor
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Docker
+docker-compose.override.yml
+**/Dockerfile*
+
+# Misc
+*.swp
+*~
+.cache/
+coverage/
+
+# Frontend assets
+public/pizza.json
