@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 DeliveryPizza — это пример микросервисного приложения для доставки еды.
 Проект включает backend на FastAPI, frontend на React + Vite и инфраструктуру на Docker Compose.
 
@@ -166,4 +165,3 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
->>>>>>> 66e7c7977ae38b29679148dc17c23d4ffc4a5795
