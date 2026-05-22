@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: deliverypizza
+
+    ports:
+      - "5432:5432"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:alpine
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:Z
+
+    depends_on:
+      - frontend
+      - gateway
+
+  frontend:
+    build:
+      context: ./DeliveryPizza-frontend
+
+  gateway:
+    build:
+      context: ./DeliveryPizza-backend
+      dockerfile: services/gateway/Dockerfile
+
+    expose:
+      - "8000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  auth:
+    build:
+      context: ./DeliveryPizza-backend
+      dockerfile: services/auth/Dockerfile
+
+    expose:
+      - "8001"
+      
+    env_file:
+    - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  catalog:
+    build:
+      context: ./DeliveryPizza-backend
+      dockerfile: services/catalog/Dockerfile
+
+    expose:
+      - "8002"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  order:
+    build:
+      context: ./DeliveryPizza-backend
+      dockerfile: services/order/Dockerfile
+
+    expose:
+      - "8003"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started

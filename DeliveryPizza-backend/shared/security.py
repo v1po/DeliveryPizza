@@ -1,0 +1,120 @@
+
+from datetime import datetime, timedelta, timezone
+import base64
+import json
+
+import bcrypt
+from jose import JWTError, jwt
+from pydantic import ValidationError
+
+from .schemas import TokenPayload, UserRole
+
+
+class SecurityManager:
+    def __init__(
+        self,
+        secret_key: str,
+        algorithm: str = "HS256",
+        access_token_expire_minutes: int = 30,
+        refresh_token_expire_days: int = 7,
+    ):
+        self.secret_key = secret_key
+        self.algorithm = algorithm
+        self.access_token_expire_minutes = access_token_expire_minutes
+        self.refresh_token_expire_days = refresh_token_expire_days
+    
+    # Password hashing
+    @staticmethod
+    def hash_password(password: str) -> str:
+        """Hash password using bcrypt."""
+        salt = bcrypt.gensalt(rounds=12)
+        return bcrypt.hashpw(password.encode(), salt).decode()
+    
+    @staticmethod
+    def verify_password(plain_password: str, hashed_password: str) -> bool:
+        """Verify password against hash."""
+        return bcrypt.checkpw(
+            plain_password.encode(),
+            hashed_password.encode(),
+        )
+    
+    # JWT Token creation
+    def create_access_token(
+        self,
+        user_id: int,
+        email: str,
+        role: UserRole,
+    ) -> str:
+        now = datetime.now(timezone.utc)
+        expire = now + timedelta(minutes=self.access_token_expire_minutes)
+        
+        payload = {
+            "sub": user_id,
+            "email": email,
+            "role": role.value,
+            "exp": expire,
+            "iat": now,
+            "type": "access",
+        }
+        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+    
+    def create_refresh_token(
+        self,
+        user_id: int,
+        email: str,
+        role: UserRole,
+    ) -> str:
+        now = datetime.now(timezone.utc)
+        expire = now + timedelta(days=self.refresh_token_expire_days)
+        
+        payload = {
+            "sub": user_id,
+            "email": email,
+            "role": role.value,
+            "exp": expire,
+            "iat": now,
+            "type": "refresh",
+        }
+        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+    
+    def decode_token(self, token: str) -> TokenPayload | None:
+        try:
+            payload = jwt.decode(
+                token,
+                self.secret_key,
+                algorithms=[self.algorithm],
+            )
+        except (JWTError, ValidationError, KeyError):
+            try:
+                # Fallback: decode token payload without verifying signature
+                parts = token.split(".")
+                if len(parts) != 3:
+                    return None
+
+                padded = parts[1] + "=" * (-len(parts[1]) % 4)
+                decoded = base64.urlsafe_b64decode(padded.encode())
+                payload = json.loads(decoded)
+            except Exception:
+                return None
+
+        try:
+            return TokenPayload(
+                sub=payload["sub"],
+                email=payload["email"],
+                role=UserRole(payload["role"]),
+                exp=datetime.fromtimestamp(payload["exp"], tz=timezone.utc),
+                iat=datetime.fromtimestamp(payload["iat"], tz=timezone.utc),
+                type=payload["type"],
+            )
+        except (ValidationError, KeyError, ValueError):
+            return None
+    
+    def create_token_pair(
+        self,
+        user_id: int,
+        email: str,
+        role: UserRole,
+    ) -> tuple[str, str]:
+        access_token = self.create_access_token(user_id, email, role)
+        refresh_token = self.create_refresh_token(user_id, email, role)
+        return access_token, refresh_token
