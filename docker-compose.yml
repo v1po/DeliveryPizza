@@ -10,6 +10,10 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: deliverypizza
 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
     ports:
       - "5432:5432"
 
@@ -18,24 +22,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    volumes:
-    - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
-
     ports:
       - "6379:6379"
 
   nginx:
     image: nginx:alpine
-
     ports:
       - "80:80"
-
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:Z
-
     depends_on:
       - frontend
       - gateway
@@ -48,10 +46,8 @@ services:
     build:
       context: ./DeliveryPizza-backend
       dockerfile: src/services/gateway/Dockerfile
-
     expose:
       - "8000"
-
     depends_on:
       postgres:
         condition: service_healthy
@@ -62,13 +58,10 @@ services:
     build:
       context: ./DeliveryPizza-backend
       dockerfile: src/services/auth/Dockerfile
-
     expose:
       - "8001"
-      
     env_file:
-    - .env
-
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,10 +72,10 @@ services:
     build:
       context: ./DeliveryPizza-backend
       dockerfile: src/services/catalog/Dockerfile
-
     expose:
       - "8002"
-
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -93,14 +86,15 @@ services:
     build:
       context: ./DeliveryPizza-backend
       dockerfile: src/services/order/Dockerfile
-
     expose:
       - "8003"
-
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_started
+
 volumes:
   postgres_data:
