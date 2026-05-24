@@ -18,6 +18,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
@@ -100,3 +102,5 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+volumes:
+  postgres_data:
