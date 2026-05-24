@@ -8,7 +8,6 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -76,7 +75,9 @@ def test_gateway_services_status_unreachable(monkeypatch):
         raise httpx.ConnectError("service unavailable")
 
     proxy_module = __import__("gateway_app.proxy", fromlist=["proxy"])
-    monkeypatch.setattr(proxy_module.httpx.AsyncClient, "request", AsyncMock(side_effect=fake_request))
+    monkeypatch.setattr(
+        proxy_module.httpx.AsyncClient, "request", AsyncMock(side_effect=fake_request)
+    )
 
     with make_client(gateway_app) as client:
         response = client.get("/services/status")
