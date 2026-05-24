@@ -2,11 +2,10 @@ FROM python:3.12
 
 WORKDIR /app
 
-COPY pyproject.toml .
-
 RUN pip install uv
-RUN uv pip install --system .
 
 COPY . .
+
+RUN uv pip install --system .
 
 CMD ["uvicorn", "services.order.app.main:app", "--host", "0.0.0.0", "--port", "8003"]
