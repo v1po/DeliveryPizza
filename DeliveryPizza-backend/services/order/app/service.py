@@ -10,12 +10,7 @@ from decimal import Decimal
 from .clients import CatalogClient
 from .models import DeliveryType, Order, PaymentStatus
 from .repository import OrderRepository
-from .schemas import (
-    OrderCreate,
-    OrderStatistics,
-    OrderStatusUpdate,
-    OrderUpdate,
-)
+from .schemas import OrderCreate, OrderStatistics, OrderStatusUpdate, OrderUpdate
 
 sys.path.insert(0, "/app")
 from shared.exceptions import (

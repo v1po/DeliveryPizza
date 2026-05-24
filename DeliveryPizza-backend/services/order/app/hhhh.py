@@ -13,7 +13,6 @@ from shared.schemas import BaseSchema, OrderStatus, TimestampMixin
 
 
 class OrderItemModifier(BaseModel):
-
     modifier_id: int
     name: str
     price: Decimal
@@ -21,7 +20,6 @@ class OrderItemModifier(BaseModel):
 
 
 class OrderItemCreate(BaseModel):
-
     product_id: int
     quantity: int = Field(ge=1, default=1)
     modifiers: list[OrderItemModifier] = []
@@ -29,7 +27,6 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderItemResponse(BaseSchema):
-
     id: int
     product_id: int
     product_name: str
@@ -42,7 +39,6 @@ class OrderItemResponse(BaseSchema):
 
 
 class OrderCreate(BaseModel):
-
     items: list[OrderItemCreate] = Field(min_length=1)
     delivery_type: DeliveryType = DeliveryType.DELIVERY
     delivery_address: str | None = Field(default=None, max_length=500)

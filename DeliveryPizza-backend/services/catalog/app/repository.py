@@ -15,7 +15,6 @@ def slugify(text: str) -> str:
 
 
 class CategoryRepository:
-
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -86,7 +85,6 @@ class CategoryRepository:
 
 
 class ProductRepository:
-
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -216,7 +214,6 @@ class ProductRepository:
 
 
 class ModifierRepository:
-
     def __init__(self, session: AsyncSession):
         self.session = session
 

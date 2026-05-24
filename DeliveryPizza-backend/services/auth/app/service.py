@@ -21,7 +21,6 @@ from shared.security import SecurityManager
 
 
 class AuthService:
-
     def __init__(
         self,
         repository: UserRepository,

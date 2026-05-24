@@ -69,11 +69,7 @@ async def seed_auth_db():
 
 async def seed_catalog_db():
     """Seed catalog database with test data."""
-    from services.catalog.app.models import (
-        Category,
-        Product,
-        ProductStatus,
-    )
+    from services.catalog.app.models import Category, Product, ProductStatus
 
     db = DatabaseManager(
         "postgresql+asyncpg://postgres:postgres@postgres:5432/catalog_db"
