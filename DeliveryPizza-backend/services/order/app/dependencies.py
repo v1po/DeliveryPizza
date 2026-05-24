@@ -1,6 +1,8 @@
 """
 FastAPI dependencies for order service.
 """
+
+import sys
 from typing import Annotated
 
 from fastapi import Depends, Header
@@ -11,13 +13,11 @@ from .config import Settings, get_settings
 from .repository import OrderRepository
 from .service import OrderService
 
-import sys
 sys.path.insert(0, "/app")
 from shared.database import DatabaseManager
 from shared.exceptions import InvalidTokenException, PermissionDeniedException
 from shared.redis_client import RedisClient
 from shared.schemas import UserRole
-
 
 # Global instances
 db_manager: DatabaseManager | None = None
@@ -68,7 +68,7 @@ async def get_order_service(
         session,
         order_number_prefix=settings.order_number_prefix,
     )
-    
+
     return OrderService(
         repository=repository,
         catalog_client=catalog,
@@ -82,7 +82,7 @@ async def get_order_service(
 # User authentication via auth service
 class CurrentUser:
     """Current authenticated user."""
-    
+
     def __init__(self, id: int, email: str, role: UserRole):
         self.id = id
         self.email = email
@@ -96,13 +96,13 @@ async def get_current_user(
     """Get current authenticated user via auth service."""
     if not authorization or not authorization.startswith("Bearer "):
         raise InvalidTokenException()
-    
+
     token = authorization.split(" ")[1]
     user_data = await auth.validate_token(token)
-    
+
     if not user_data:
         raise InvalidTokenException()
-    
+
     return CurrentUser(
         id=user_data["id"],
         email=user_data["email"],
@@ -119,12 +119,14 @@ async def get_current_active_user(
 
 def require_roles(*roles: UserRole):
     """Dependency factory for role-based access control."""
+
     async def role_checker(user: CurrentUser = Depends(get_current_active_user)):
         if user.role not in roles:
             raise PermissionDeniedException(
                 f"Required role: {', '.join(r.value for r in roles)}"
             )
         return user
+
     return role_checker
 
 

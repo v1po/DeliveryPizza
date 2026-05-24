@@ -1,6 +1,8 @@
 """
 Order service Pydantic schemas.
 """
+
+import sys
 from datetime import datetime
 from decimal import Decimal
 
@@ -8,15 +10,15 @@ from pydantic import BaseModel, EmailStr, Field
 
 from .models import DeliveryType, PaymentMethod, PaymentStatus
 
-import sys
 sys.path.insert(0, "/app")
 from shared.schemas import BaseSchema, OrderStatus, TimestampMixin
 
-
 # ==================== Order Item Schemas ====================
+
 
 class OrderItemModifier(BaseModel):
     """Order item modifier schema."""
+
     modifier_id: int
     name: str
     price: Decimal
@@ -25,6 +27,7 @@ class OrderItemModifier(BaseModel):
 
 class OrderItemCreate(BaseModel):
     """Order item creation schema."""
+
     product_id: int
     quantity: int = Field(ge=1, default=1)
     modifiers: list[OrderItemModifier] = []
@@ -33,6 +36,7 @@ class OrderItemCreate(BaseModel):
 
 class OrderItemResponse(BaseSchema):
     """Order item response schema."""
+
     id: int
     product_id: int
     product_name: str
@@ -46,8 +50,10 @@ class OrderItemResponse(BaseSchema):
 
 # ==================== Order Schemas ====================
 
+
 class OrderCreate(BaseModel):
     """Order creation schema."""
+
     items: list[OrderItemCreate] = Field(min_length=1)
     delivery_type: DeliveryType = DeliveryType.DELIVERY
     delivery_address: str | None = Field(default=None, max_length=500)
@@ -63,6 +69,7 @@ class OrderCreate(BaseModel):
 
 class OrderUpdate(BaseModel):
     """Order update schema (limited fields)."""
+
     delivery_address: str | None = None
     contact_name: str | None = None
     contact_phone: str | None = None
@@ -71,12 +78,14 @@ class OrderUpdate(BaseModel):
 
 class OrderStatusUpdate(BaseModel):
     """Order status update schema."""
+
     status: OrderStatus
     note: str | None = None
 
 
 class OrderResponse(BaseSchema, TimestampMixin):
     """Order response schema."""
+
     id: int
     order_number: str
     user_id: int
@@ -102,6 +111,7 @@ class OrderResponse(BaseSchema, TimestampMixin):
 
 class OrderListResponse(BaseSchema):
     """Order list item response (lighter)."""
+
     id: int
     order_number: str
     status: OrderStatus
@@ -114,6 +124,7 @@ class OrderListResponse(BaseSchema):
 
 class OrderStatusHistoryResponse(BaseSchema):
     """Order status history response."""
+
     id: int
     status: OrderStatus
     note: str | None
@@ -123,8 +134,10 @@ class OrderStatusHistoryResponse(BaseSchema):
 
 # ==================== Statistics ====================
 
+
 class OrderStatistics(BaseModel):
     """Order statistics schema."""
+
     total_orders: int
     pending_orders: int
     completed_orders: int

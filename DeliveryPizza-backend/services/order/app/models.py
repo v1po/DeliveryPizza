@@ -1,23 +1,15 @@
 """
 Order SQLAlchemy models.
 """
+
+import sys
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum as PyEnum
 
-from sqlalchemy import (
-    DateTime,
-    Enum,
-    ForeignKey,
-    Index,
-    Numeric,
-    String,
-    Text,
-    func,
-)
+from sqlalchemy import DateTime, Enum, ForeignKey, Index, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-import sys
 sys.path.insert(0, "/app")
 from shared.database import Base
 from shared.schemas import OrderStatus
@@ -25,6 +17,7 @@ from shared.schemas import OrderStatus
 
 class PaymentStatus(str, PyEnum):
     """Payment status enumeration."""
+
     PENDING = "pending"
     PAID = "paid"
     FAILED = "failed"
@@ -33,6 +26,7 @@ class PaymentStatus(str, PyEnum):
 
 class PaymentMethod(str, PyEnum):
     """Payment method enumeration."""
+
     CASH = "cash"
     CARD = "card"
     ONLINE = "online"
@@ -40,15 +34,16 @@ class PaymentMethod(str, PyEnum):
 
 class DeliveryType(str, PyEnum):
     """Delivery type enumeration."""
+
     DELIVERY = "delivery"
     PICKUP = "pickup"
 
 
 class Order(Base):
     """Order model."""
-    
+
     __tablename__ = "orders"
-    
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     order_number: Mapped[str] = mapped_column(
         String(50),
@@ -57,14 +52,14 @@ class Order(Base):
         index=True,
     )
     user_id: Mapped[int] = mapped_column(nullable=False, index=True)
-    
+
     # Order status
     status: Mapped[OrderStatus] = mapped_column(
         Enum(OrderStatus),
         default=OrderStatus.PENDING,
         nullable=False,
     )
-    
+
     # Delivery info
     delivery_type: Mapped[DeliveryType] = mapped_column(
         Enum(DeliveryType),
@@ -80,12 +75,12 @@ class Order(Base):
         Numeric(11, 8),
         nullable=True,
     )
-    
+
     # Contact info
     contact_name: Mapped[str] = mapped_column(String(200), nullable=False)
     contact_phone: Mapped[str] = mapped_column(String(20), nullable=False)
     contact_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    
+
     # Pricing
     subtotal: Mapped[Decimal] = mapped_column(
         Numeric(10, 2),
@@ -105,7 +100,7 @@ class Order(Base):
         Numeric(10, 2),
         nullable=False,
     )
-    
+
     # Payment
     payment_method: Mapped[PaymentMethod] = mapped_column(
         Enum(PaymentMethod),
@@ -117,11 +112,11 @@ class Order(Base):
         default=PaymentStatus.PENDING,
         nullable=False,
     )
-    
+
     # Notes
     customer_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     internal_note: Mapped[str | None] = mapped_column(Text, nullable=True)
-    
+
     # Timing
     estimated_delivery: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
@@ -131,7 +126,7 @@ class Order(Base):
         DateTime(timezone=True),
         nullable=True,
     )
-    
+
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -143,7 +138,7 @@ class Order(Base):
         onupdate=func.now(),
         nullable=True,
     )
-    
+
     # Relationships
     items: Mapped[list["OrderItem"]] = relationship(
         "OrderItem",
@@ -155,7 +150,7 @@ class Order(Base):
         back_populates="order",
         cascade="all, delete-orphan",
     )
-    
+
     __table_args__ = (
         Index("idx_orders_user_status", "user_id", "status"),
         Index("idx_orders_status_created", "status", "created_at"),
@@ -165,9 +160,9 @@ class Order(Base):
 
 class OrderItem(Base):
     """Order item model."""
-    
+
     __tablename__ = "order_items"
-    
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     order_id: Mapped[int] = mapped_column(
         ForeignKey("orders.id", ondelete="CASCADE"),
@@ -191,20 +186,18 @@ class OrderItem(Base):
         nullable=False,
     )
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
-    
+
     # Relationships
     order: Mapped[Order] = relationship("Order", back_populates="items")
-    
-    __table_args__ = (
-        Index("idx_order_items_order", "order_id"),
-    )
+
+    __table_args__ = (Index("idx_order_items_order", "order_id"),)
 
 
 class OrderStatusHistory(Base):
     """Order status history model."""
-    
+
     __tablename__ = "order_status_history"
-    
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     order_id: Mapped[int] = mapped_column(
         ForeignKey("orders.id", ondelete="CASCADE"),
@@ -221,10 +214,8 @@ class OrderStatusHistory(Base):
         server_default=func.now(),
         nullable=False,
     )
-    
+
     # Relationships
     order: Mapped[Order] = relationship("Order", back_populates="status_history")
-    
-    __table_args__ = (
-        Index("idx_status_history_order", "order_id"),
-    )
+
+    __table_args__ = (Index("idx_status_history_order", "order_id"),)

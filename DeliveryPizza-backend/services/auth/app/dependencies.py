@@ -1,23 +1,22 @@
 """
 FastAPI dependencies for auth service.
 """
+
+import sys
 from typing import Annotated
 
 from fastapi import Depends, Header, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .config import Settings, get_settings
 from .repository import UserRepository
 from .service import AuthService
 
-import sys
 sys.path.insert(0, "/app")
 from shared.database import DatabaseManager
 from shared.exceptions import InvalidTokenException, PermissionDeniedException
 from shared.redis_client import RedisClient
 from shared.schemas import UserRole
 from shared.security import SecurityManager
-
 
 # Global instances (initialized in main.py lifespan)
 db_manager: DatabaseManager | None = None
@@ -88,7 +87,7 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    user = Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
     """Get current active user."""
     if not user.is_active:
@@ -98,12 +97,14 @@ async def get_current_active_user(
 
 def require_roles(*roles: UserRole):
     """Dependency factory for role-based access control."""
-    async def role_checker(user = Depends(get_current_active_user)):
+
+    async def role_checker(user=Depends(get_current_active_user)):
         if user.role not in roles:
             raise PermissionDeniedException(
                 f"Required role: {', '.join(r.value for r in roles)}"
             )
         return user
+
     return role_checker
 
 

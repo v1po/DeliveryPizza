@@ -1,6 +1,9 @@
 """
 FastAPI dependencies for catalog service.
 """
+
+import sys
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,11 +11,9 @@ from .config import Settings, get_settings
 from .repository import CategoryRepository, ModifierRepository, ProductRepository
 from .service import CatalogService
 
-import sys
 sys.path.insert(0, "/app")
 from shared.database import DatabaseManager
 from shared.redis_client import RedisClient
-
 
 # Global instances
 db_manager: DatabaseManager | None = None
@@ -47,7 +48,7 @@ async def get_catalog_service(
     category_repo = CategoryRepository(session)
     product_repo = ProductRepository(session)
     modifier_repo = ModifierRepository(session)
-    
+
     return CatalogService(
         category_repo=category_repo,
         product_repo=product_repo,

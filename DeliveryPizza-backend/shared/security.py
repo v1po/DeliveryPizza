@@ -1,7 +1,6 @@
-
-from datetime import datetime, timedelta, timezone
 import base64
 import json
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from jose import JWTError, jwt
@@ -22,14 +21,14 @@ class SecurityManager:
         self.algorithm = algorithm
         self.access_token_expire_minutes = access_token_expire_minutes
         self.refresh_token_expire_days = refresh_token_expire_days
-    
+
     # Password hashing
     @staticmethod
     def hash_password(password: str) -> str:
         """Hash password using bcrypt."""
         salt = bcrypt.gensalt(rounds=12)
         return bcrypt.hashpw(password.encode(), salt).decode()
-    
+
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify password against hash."""
@@ -37,7 +36,7 @@ class SecurityManager:
             plain_password.encode(),
             hashed_password.encode(),
         )
-    
+
     # JWT Token creation
     def create_access_token(
         self,
@@ -47,7 +46,7 @@ class SecurityManager:
     ) -> str:
         now = datetime.now(timezone.utc)
         expire = now + timedelta(minutes=self.access_token_expire_minutes)
-        
+
         payload = {
             "sub": user_id,
             "email": email,
@@ -57,7 +56,7 @@ class SecurityManager:
             "type": "access",
         }
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
-    
+
     def create_refresh_token(
         self,
         user_id: int,
@@ -66,7 +65,7 @@ class SecurityManager:
     ) -> str:
         now = datetime.now(timezone.utc)
         expire = now + timedelta(days=self.refresh_token_expire_days)
-        
+
         payload = {
             "sub": user_id,
             "email": email,
@@ -76,7 +75,7 @@ class SecurityManager:
             "type": "refresh",
         }
         return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
-    
+
     def decode_token(self, token: str) -> TokenPayload | None:
         try:
             payload = jwt.decode(
@@ -108,7 +107,7 @@ class SecurityManager:
             )
         except (ValidationError, KeyError, ValueError):
             return None
-    
+
     def create_token_pair(
         self,
         user_id: int,

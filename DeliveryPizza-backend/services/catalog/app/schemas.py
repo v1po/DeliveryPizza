@@ -1,22 +1,23 @@
 """
 Catalog service Pydantic schemas.
 """
-from datetime import datetime
+
+import sys
 from decimal import Decimal
 
 from pydantic import BaseModel, Field, field_validator
 
 from .models import ProductStatus
 
-import sys
 sys.path.insert(0, "/app")
 from shared.schemas import BaseSchema, TimestampMixin
 
-
 # ==================== Category Schemas ====================
+
 
 class CategoryBase(BaseModel):
     """Base category schema."""
+
     name: str = Field(min_length=1, max_length=100)
     description: str | None = None
     image_url: str | None = Field(default=None, max_length=500)
@@ -26,11 +27,13 @@ class CategoryBase(BaseModel):
 
 class CategoryCreate(CategoryBase):
     """Category creation schema."""
+
     slug: str | None = Field(default=None, max_length=100)
 
 
 class CategoryUpdate(BaseModel):
     """Category update schema."""
+
     name: str | None = Field(default=None, min_length=1, max_length=100)
     slug: str | None = Field(default=None, max_length=100)
     description: str | None = None
@@ -42,6 +45,7 @@ class CategoryUpdate(BaseModel):
 
 class CategoryResponse(BaseSchema, TimestampMixin):
     """Category response schema."""
+
     id: int
     name: str
     slug: str
@@ -54,14 +58,17 @@ class CategoryResponse(BaseSchema, TimestampMixin):
 
 class CategoryWithChildren(CategoryResponse):
     """Category with children response."""
+
     children: list["CategoryWithChildren"] = []
     products_count: int = 0
 
 
 # ==================== Product Modifier Schemas ====================
 
+
 class ModifierBase(BaseModel):
     """Base modifier schema."""
+
     name: str = Field(min_length=1, max_length=100)
     price: Decimal = Field(ge=0, default=Decimal("0"))
     is_required: bool = False
@@ -71,11 +78,13 @@ class ModifierBase(BaseModel):
 
 class ModifierCreate(ModifierBase):
     """Modifier creation schema."""
+
     pass
 
 
 class ModifierUpdate(BaseModel):
     """Modifier update schema."""
+
     name: str | None = Field(default=None, min_length=1, max_length=100)
     price: Decimal | None = Field(default=None, ge=0)
     is_required: bool | None = None
@@ -85,6 +94,7 @@ class ModifierUpdate(BaseModel):
 
 class ModifierResponse(BaseSchema):
     """Modifier response schema."""
+
     id: int
     name: str
     price: Decimal
@@ -95,8 +105,10 @@ class ModifierResponse(BaseSchema):
 
 # ==================== Product Schemas ====================
 
+
 class ProductBase(BaseModel):
     """Base product schema."""
+
     name: str = Field(min_length=1, max_length=200)
     description: str | None = None
     short_description: str | None = Field(default=None, max_length=500)
@@ -112,7 +124,7 @@ class ProductBase(BaseModel):
     ingredients: str | None = None
     allergens: str | None = Field(default=None, max_length=500)
     sort_order: int = 0
-    
+
     @field_validator("old_price")
     @classmethod
     def validate_old_price(cls, v, info):
@@ -123,12 +135,14 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     """Product creation schema."""
+
     slug: str | None = Field(default=None, max_length=200)
     modifiers: list[ModifierCreate] = []
 
 
 class ProductUpdate(BaseModel):
     """Product update schema."""
+
     name: str | None = Field(default=None, min_length=1, max_length=200)
     slug: str | None = Field(default=None, max_length=200)
     description: str | None = None
@@ -149,6 +163,7 @@ class ProductUpdate(BaseModel):
 
 class ProductResponse(BaseSchema, TimestampMixin):
     """Product response schema."""
+
     id: int
     name: str
     slug: str
@@ -171,6 +186,7 @@ class ProductResponse(BaseSchema, TimestampMixin):
 
 class ProductListResponse(BaseSchema):
     """Product list item response (lighter version)."""
+
     id: int
     name: str
     slug: str
@@ -186,8 +202,10 @@ class ProductListResponse(BaseSchema):
 
 # ==================== Menu Schemas ====================
 
+
 class MenuCategory(BaseModel):
     """Menu category with products."""
+
     id: int
     name: str
     slug: str
@@ -198,5 +216,6 @@ class MenuCategory(BaseModel):
 
 class MenuResponse(BaseModel):
     """Full menu response."""
+
     categories: list[MenuCategory]
     featured_products: list[ProductListResponse]

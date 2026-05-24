@@ -2,6 +2,7 @@
 Test data seeder for development.
 Run: python -m scripts.seed_data
 """
+
 import asyncio
 import sys
 from decimal import Decimal
@@ -16,12 +17,12 @@ async def seed_auth_db():
     """Seed auth database with test users."""
     from services.auth.app.models import User
     from shared.schemas import UserRole
-    
+
     db = DatabaseManager("postgresql+asyncpg://postgres:postgres@postgres:5432/auth_db")
     security = SecurityManager("test-secret-key")
-    
+
     await db.create_tables()
-    
+
     users = [
         {
             "email": "admin@example.com",
@@ -56,31 +57,62 @@ async def seed_auth_db():
             "is_verified": True,
         },
     ]
-    
+
     async with db.session() as session:
         for user_data in users:
             user = User(**user_data)
             session.add(user)
         await session.commit()
-    
+
     print("✅ Auth database seeded")
 
 
 async def seed_catalog_db():
     """Seed catalog database with test data."""
-    from services.catalog.app.models import Category, Product, ProductModifier, ProductStatus
-    
-    db = DatabaseManager("postgresql+asyncpg://postgres:postgres@postgres:5432/catalog_db")
+    from services.catalog.app.models import (
+        Category,
+        Product,
+        ProductStatus,
+    )
+
+    db = DatabaseManager(
+        "postgresql+asyncpg://postgres:postgres@postgres:5432/catalog_db"
+    )
     await db.create_tables()
-    
+
     categories = [
-        {"name": "Пицца", "slug": "pizza", "description": "Итальянская пицца на тонком тесте", "sort_order": 1},
-        {"name": "Бургеры", "slug": "burgers", "description": "Сочные бургеры с различными начинками", "sort_order": 2},
-        {"name": "Суши", "slug": "sushi", "description": "Свежие роллы и суши", "sort_order": 3},
-        {"name": "Напитки", "slug": "drinks", "description": "Прохладительные напитки", "sort_order": 4},
-        {"name": "Десерты", "slug": "desserts", "description": "Сладкие десерты", "sort_order": 5},
+        {
+            "name": "Пицца",
+            "slug": "pizza",
+            "description": "Итальянская пицца на тонком тесте",
+            "sort_order": 1,
+        },
+        {
+            "name": "Бургеры",
+            "slug": "burgers",
+            "description": "Сочные бургеры с различными начинками",
+            "sort_order": 2,
+        },
+        {
+            "name": "Суши",
+            "slug": "sushi",
+            "description": "Свежие роллы и суши",
+            "sort_order": 3,
+        },
+        {
+            "name": "Напитки",
+            "slug": "drinks",
+            "description": "Прохладительные напитки",
+            "sort_order": 4,
+        },
+        {
+            "name": "Десерты",
+            "slug": "desserts",
+            "description": "Сладкие десерты",
+            "sort_order": 5,
+        },
     ]
-    
+
     async with db.session() as session:
         # Create categories
         cat_objects = {}
@@ -89,7 +121,7 @@ async def seed_catalog_db():
             session.add(cat)
             await session.flush()
             cat_objects[cat_data["slug"]] = cat
-        
+
         # Create products
         products = [
             # Пицца
@@ -223,30 +255,30 @@ async def seed_catalog_db():
                 "preparation_time": 5,
             },
         ]
-        
+
         for prod_data in products:
             product = Product(**prod_data)
             session.add(product)
-        
+
         await session.commit()
-    
+
     print("✅ Catalog database seeded")
 
 
 async def main():
     """Run all seeders."""
     print("🌱 Starting database seeding...")
-    
+
     try:
         await seed_auth_db()
     except Exception as e:
         print(f"❌ Auth seeding failed: {e}")
-    
+
     try:
         await seed_catalog_db()
     except Exception as e:
         print(f"❌ Catalog seeding failed: {e}")
-    
+
     print("🎉 Seeding complete!")
     print("\n📧 Test accounts:")
     print("  admin@example.com / Admin123!")

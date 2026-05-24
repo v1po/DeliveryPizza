@@ -1,4 +1,4 @@
-
+import sys
 from datetime import datetime
 from decimal import Decimal
 
@@ -6,12 +6,11 @@ from pydantic import BaseModel, EmailStr, Field
 
 from .models import DeliveryType, PaymentMethod, PaymentStatus
 
-import sys
 sys.path.insert(0, "/app")
 from shared.schemas import BaseSchema, OrderStatus, TimestampMixin
 
-
 # ==================== Order Item Schemas ====================
+
 
 class OrderItemModifier(BaseModel):
 
@@ -40,8 +39,6 @@ class OrderItemResponse(BaseSchema):
     modifiers_total: Decimal
     subtotal: Decimal
     note: str | None
-
-
 
 
 class OrderCreate(BaseModel):
@@ -112,7 +109,6 @@ class OrderStatusHistoryResponse(BaseSchema):
     note: str | None
     changed_by: int | None
     created_at: datetime
-
 
 
 class OrderStatistics(BaseModel):

@@ -1,6 +1,8 @@
 """
 API Gateway main application.
 """
+
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -11,10 +13,8 @@ from .config import get_settings
 from .middleware import RateLimitMiddleware
 from .proxy import ServiceProxy
 
-import sys
 sys.path.insert(0, "/app")
 from shared.redis_client import RedisClient
-
 
 # Global instances
 redis_client: RedisClient | None = None
@@ -25,13 +25,13 @@ service_proxy: ServiceProxy | None = None
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     global redis_client, service_proxy
-    
+
     settings = get_settings()
-    
+
     # Initialize Redis
     redis_client = RedisClient(settings.redis_url)
     await redis_client.connect()
-    
+
     # Initialize service proxy
     service_proxy = ServiceProxy(
         auth_url=settings.auth_service_url,
@@ -39,9 +39,9 @@ async def lifespan(app: FastAPI):
         order_url=settings.order_service_url,
         timeout=settings.request_timeout,
     )
-    
+
     yield
-    
+
     # Cleanup
     if redis_client:
         await redis_client.disconnect()
@@ -89,14 +89,14 @@ async def health_check():
 async def services_status():
     """Check status of all services."""
     import httpx
-    
+
     statuses = {}
     services = {
         "auth": settings.auth_service_url,
         "catalog": settings.catalog_service_url,
         "order": settings.order_service_url,
     }
-    
+
     async with httpx.AsyncClient(timeout=5.0) as client:
         for name, url in services.items():
             try:
@@ -110,7 +110,7 @@ async def services_status():
                     "status": "unreachable",
                     "url": url,
                 }
-    
+
     return {"services": statuses}
 
 
@@ -128,7 +128,7 @@ async def proxy_api(request: Request, path: str):
             status_code=503,
             content={"success": False, "message": "Gateway not initialized"},
         )
-    
+
     full_path = f"/api/{path}"
     return await service_proxy.proxy_request(request, full_path)
 

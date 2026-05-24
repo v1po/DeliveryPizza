@@ -1,6 +1,8 @@
 """
 Order Service main application.
 """
+
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -12,7 +14,6 @@ from .clients import AuthClient, CatalogClient
 from .config import get_settings
 from .routes import admin_router, router
 
-import sys
 sys.path.insert(0, "/app")
 from shared.database import DatabaseManager
 from shared.exceptions import BaseAPIException
@@ -23,21 +24,21 @@ from shared.redis_client import RedisClient
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     settings = get_settings()
-    
+
     # Initialize database
     dependencies.db_manager = DatabaseManager(settings.database_url)
     await dependencies.db_manager.create_tables()
-    
+
     # Initialize Redis
     dependencies.redis_client = RedisClient(settings.redis_url)
     await dependencies.redis_client.connect()
-    
+
     # Initialize HTTP clients
     dependencies.auth_client = AuthClient(settings.auth_service_url)
     dependencies.catalog_client = CatalogClient(settings.catalog_service_url)
-    
+
     yield
-    
+
     # Cleanup
     if dependencies.redis_client:
         await dependencies.redis_client.disconnect()

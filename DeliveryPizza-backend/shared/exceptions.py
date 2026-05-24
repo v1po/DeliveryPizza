@@ -1,12 +1,13 @@
 """
 Custom exceptions for microservices.
 """
+
 from fastapi import HTTPException, status
 
 
 class BaseAPIException(HTTPException):
     """Base API exception."""
-    
+
     def __init__(
         self,
         status_code: int,
@@ -20,7 +21,7 @@ class BaseAPIException(HTTPException):
 # Authentication exceptions
 class InvalidCredentialsException(BaseAPIException):
     """Invalid credentials provided."""
-    
+
     def __init__(self, detail: str = "Invalid email or password"):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -31,7 +32,7 @@ class InvalidCredentialsException(BaseAPIException):
 
 class TokenExpiredException(BaseAPIException):
     """Token has expired."""
-    
+
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,7 +43,7 @@ class TokenExpiredException(BaseAPIException):
 
 class InvalidTokenException(BaseAPIException):
     """Invalid token provided."""
-    
+
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -53,7 +54,7 @@ class InvalidTokenException(BaseAPIException):
 
 class TokenBlacklistedException(BaseAPIException):
     """Token has been blacklisted."""
-    
+
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -65,7 +66,7 @@ class TokenBlacklistedException(BaseAPIException):
 # Authorization exceptions
 class PermissionDeniedException(BaseAPIException):
     """User doesn't have required permissions."""
-    
+
     def __init__(self, detail: str = "Permission denied"):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -77,7 +78,7 @@ class PermissionDeniedException(BaseAPIException):
 # Resource exceptions
 class NotFoundException(BaseAPIException):
     """Resource not found."""
-    
+
     def __init__(self, resource: str = "Resource"):
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -88,7 +89,7 @@ class NotFoundException(BaseAPIException):
 
 class AlreadyExistsException(BaseAPIException):
     """Resource already exists."""
-    
+
     def __init__(self, resource: str = "Resource"):
         super().__init__(
             status_code=status.HTTP_409_CONFLICT,
@@ -100,7 +101,7 @@ class AlreadyExistsException(BaseAPIException):
 # Validation exceptions
 class ValidationException(BaseAPIException):
     """Validation error."""
-    
+
     def __init__(self, detail: str):
         super().__init__(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -112,7 +113,7 @@ class ValidationException(BaseAPIException):
 # Service exceptions
 class ServiceUnavailableException(BaseAPIException):
     """External service is unavailable."""
-    
+
     def __init__(self, service: str = "Service"):
         super().__init__(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

@@ -1,15 +1,13 @@
 """
 Auth API routes.
 """
+
+import sys
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Query, status
 
-from .dependencies import (
-    get_admin_user,
-    get_auth_service,
-    get_current_active_user,
-)
+from .dependencies import get_admin_user, get_auth_service, get_current_active_user
 from .models import User
 from .schemas import (
     LoginRequest,
@@ -25,7 +23,6 @@ from .schemas import (
 )
 from .service import AuthService
 
-import sys
 sys.path.insert(0, "/app")
 from shared.schemas import (
     PaginatedResponse,
@@ -34,11 +31,11 @@ from shared.schemas import (
     UserRole,
 )
 
-
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 
 # ==================== Public endpoints ====================
+
 
 @router.post(
     "/register",
@@ -72,7 +69,7 @@ async def login(
         email=data.email,
         password=data.password,
     )
-    
+
     return ResponseWrapper(
         message="Login successful",
         data=TokenResponse(
@@ -94,7 +91,7 @@ async def refresh_token(
 ):
     """Refresh access token using refresh token."""
     access_token, refresh_token = await service.refresh_tokens(data.refresh_token)
-    
+
     return ResponseWrapper(
         message="Token refreshed successfully",
         data=TokenResponse(
@@ -121,11 +118,12 @@ async def logout(
     if auth_header and auth_header.startswith("Bearer "):
         access_token = auth_header.split(" ")[1]
         await service.logout(access_token, data.refresh_token)
-    
+
     return ResponseWrapper(message="Logged out successfully")
 
 
 # ==================== Protected endpoints ====================
+
 
 @router.get(
     "/me",
@@ -178,6 +176,7 @@ async def change_password(
 
 # ==================== Token validation (internal) ====================
 
+
 @router.get(
     "/validate",
     response_model=ResponseWrapper[UserResponse],
@@ -220,7 +219,7 @@ async def list_users(
         role=role,
         is_active=is_active,
     )
-    
+
     return ResponseWrapper(
         data=PaginatedResponse.create(
             items=[UserResponse.model_validate(u) for u in users],

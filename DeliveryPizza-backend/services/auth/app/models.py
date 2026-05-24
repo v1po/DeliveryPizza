@@ -1,12 +1,13 @@
 """
 User SQLAlchemy models.
 """
+
+import sys
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Enum, Index, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-import sys
 sys.path.insert(0, "/app")
 from shared.database import Base
 from shared.schemas import UserRole
@@ -14,9 +15,9 @@ from shared.schemas import UserRole
 
 class User(Base):
     """User model."""
-    
+
     __tablename__ = "users"
-    
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(
         String(255),
@@ -49,11 +50,11 @@ class User(Base):
         DateTime(timezone=True),
         nullable=True,
     )
-    
+
     __table_args__ = (
         Index("idx_users_email_active", "email", "is_active"),
         Index("idx_users_role", "role"),
     )
-    
+
     def __repr__(self) -> str:
         return f"<User {self.email}>"

@@ -1,7 +1,8 @@
 """
 Catalog API routes.
 """
-from typing import Annotated
+
+import sys
 
 from fastapi import APIRouter, Depends, Query, status
 
@@ -23,10 +24,8 @@ from .schemas import (
 )
 from .service import CatalogService
 
-import sys
 sys.path.insert(0, "/app")
 from shared.schemas import PaginatedResponse, PaginationParams, ResponseWrapper
-
 
 # ==================== Category Routes ====================
 
@@ -154,7 +153,7 @@ async def get_products(
         is_featured=is_featured,
         search=search,
     )
-    
+
     return ResponseWrapper(
         data=PaginatedResponse.create(
             items=[ProductListResponse.model_validate(p) for p in products],
@@ -260,6 +259,7 @@ async def delete_product(
 
 
 # ==================== Modifier Routes ====================
+
 
 @product_router.post(
     "/{product_id}/modifiers",

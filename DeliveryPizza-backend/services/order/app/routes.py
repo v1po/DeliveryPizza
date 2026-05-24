@@ -1,14 +1,15 @@
 """
 Order API routes.
 """
+
+import sys
 from datetime import datetime
-from typing import Annotated
+from shared.schemas import UserRole
 
 from fastapi import APIRouter, Depends, Query, status
 
 from .dependencies import (
     CurrentUser,
-    get_admin_user,
     get_courier_user,
     get_current_active_user,
     get_manager_user,
@@ -26,7 +27,6 @@ from .schemas import (
 )
 from .service import OrderService
 
-import sys
 sys.path.insert(0, "/app")
 from shared.schemas import (
     OrderStatus,
@@ -35,11 +35,11 @@ from shared.schemas import (
     ResponseWrapper,
 )
 
-
 router = APIRouter(prefix="/api/v1/orders", tags=["Orders"])
 
 
 # ==================== Customer endpoints ====================
+
 
 @router.post(
     "",
@@ -80,21 +80,23 @@ async def get_my_orders(
         limit=pagination.size,
         status=status,
     )
-    
+
     # Convert to list response
     items = []
     for order in orders:
-        items.append(OrderListResponse(
-            id=order.id,
-            order_number=order.order_number,
-            status=order.status,
-            delivery_type=order.delivery_type,
-            total=order.total,
-            payment_status=order.payment_status,
-            items_count=len(order.items),
-            created_at=order.created_at,
-        ))
-    
+        items.append(
+            OrderListResponse(
+                id=order.id,
+                order_number=order.order_number,
+                status=order.status,
+                delivery_type=order.delivery_type,
+                total=order.total,
+                payment_status=order.payment_status,
+                items_count=len(order.items),
+                created_at=order.created_at,
+            )
+        )
+
     return ResponseWrapper(
         data=PaginatedResponse.create(
             items=items,
@@ -190,10 +192,9 @@ async def get_order_history(
     """Get order status history."""
     user_id = None if user.role in [UserRole.ADMIN, UserRole.MANAGER] else user.id
     order = await service.get_order(order_id, user_id)
-    
+
     history = [
-        OrderStatusHistoryResponse.model_validate(h)
-        for h in order.status_history
+        OrderStatusHistoryResponse.model_validate(h) for h in order.status_history
     ]
     return ResponseWrapper(data=history)
 
@@ -228,20 +229,22 @@ async def get_all_orders(
         date_from=date_from,
         date_to=date_to,
     )
-    
+
     items = []
     for order in orders:
-        items.append(OrderListResponse(
-            id=order.id,
-            order_number=order.order_number,
-            status=order.status,
-            delivery_type=order.delivery_type,
-            total=order.total,
-            payment_status=order.payment_status,
-            items_count=len(order.items),
-            created_at=order.created_at,
-        ))
-    
+        items.append(
+            OrderListResponse(
+                id=order.id,
+                order_number=order.order_number,
+                status=order.status,
+                delivery_type=order.delivery_type,
+                total=order.total,
+                payment_status=order.payment_status,
+                items_count=len(order.items),
+                created_at=order.created_at,
+            )
+        )
+
     return ResponseWrapper(
         data=PaginatedResponse.create(
             items=items,
@@ -315,6 +318,3 @@ async def get_statistics(
     )
     return ResponseWrapper(data=stats)
 
-
-# Import UserRole for route checks
-from shared.schemas import UserRole

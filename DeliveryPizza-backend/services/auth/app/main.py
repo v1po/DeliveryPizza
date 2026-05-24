@@ -1,6 +1,8 @@
 """
 Auth Service main application.
 """
+
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -9,12 +11,10 @@ from fastapi.responses import JSONResponse
 
 from . import dependencies
 from .config import get_settings
-from .models import User
 from .routes import admin_router, router
 
-import sys
 sys.path.insert(0, "/app")
-from shared.database import Base, DatabaseManager
+from shared.database import DatabaseManager
 from shared.exceptions import BaseAPIException
 from shared.redis_client import RedisClient
 from shared.security import SecurityManager
@@ -24,15 +24,15 @@ from shared.security import SecurityManager
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     settings = get_settings()
-    
+
     # Initialize database
     dependencies.db_manager = DatabaseManager(settings.database_url)
     await dependencies.db_manager.create_tables()
-    
+
     # Initialize Redis
     dependencies.redis_client = RedisClient(settings.redis_url)
     await dependencies.redis_client.connect()
-    
+
     # Initialize security
     dependencies.security_manager = SecurityManager(
         secret_key=settings.secret_key,
@@ -40,9 +40,9 @@ async def lifespan(app: FastAPI):
         access_token_expire_minutes=settings.access_token_expire_minutes,
         refresh_token_expire_days=settings.refresh_token_expire_days,
     )
-    
+
     yield
-    
+
     # Cleanup
     if dependencies.redis_client:
         await dependencies.redis_client.disconnect()
