@@ -45,7 +45,7 @@ services:
   gateway:
     build:
       context: ./DeliveryPizza-backend
-      dockerfile: services/gateway/Dockerfile
+      dockerfile: src/services/gateway/Dockerfile
 
     expose:
       - "8000"
@@ -59,7 +59,7 @@ services:
   auth:
     build:
       context: ./DeliveryPizza-backend
-      dockerfile: services/auth/Dockerfile
+      dockerfile: src/services/auth/Dockerfile
 
     expose:
       - "8001"
@@ -76,7 +76,7 @@ services:
   catalog:
     build:
       context: ./DeliveryPizza-backend
-      dockerfile: services/catalog/Dockerfile
+      dockerfile: src/services/catalog/Dockerfile
 
     expose:
       - "8002"
@@ -90,7 +90,7 @@ services:
   order:
     build:
       context: ./DeliveryPizza-backend
-      dockerfile: services/order/Dockerfile
+      dockerfile: src/services/order/Dockerfile
 
     expose:
       - "8003"
