@@ -5,7 +5,6 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 import httpx
-import pytest
 from fastapi.testclient import TestClient
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
