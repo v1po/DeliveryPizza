@@ -22,7 +22,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install pytest black isort ruff
-          python -m pip install .
 
       - name: Lint backend
         run: |
@@ -45,12 +44,15 @@ jobs:
           node-version: 20
 
       - name: Install frontend dependencies
+        working-directory: ./DeliveryPizza-frontend
         run: npm install
 
       - name: Lint and type-check frontend
+        working-directory: ./DeliveryPizza-frontend
         run: npm run check
 
       - name: Build frontend
+        working-directory: ./DeliveryPizza-frontend
         run: npm run build
 
   docker-build:
