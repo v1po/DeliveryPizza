@@ -2,15 +2,16 @@ import sys
 from pathlib import Path
 from unittest.mock import AsyncMock
 
+import pytest
+
 backend_root = Path(__file__).resolve().parents[1]
 backend_src = backend_root / "src"
+
 if str(backend_src) not in sys.path:
     sys.path.insert(0, str(backend_src))
 
-import pytest
-
-from shared.database import DatabaseManager
-from shared.redis_client import RedisClient
+from shared.database import DatabaseManager  # noqa: E402
+from shared.redis_client import RedisClient  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -25,7 +26,6 @@ def disable_external_services(monkeypatch):
 @pytest.fixture(autouse=True)
 def patch_app_sys_path(monkeypatch):
     """Intercept /app path insertion in service app modules and redirect it to the backend root."""
-    backend_root = str(__import__("pathlib").Path(__file__).resolve().parents[1])
 
     class BackendPathList(list):
         def insert(self, index, path):
