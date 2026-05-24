@@ -41,9 +41,15 @@ jobs:
 
 
   deploy:
-    name: Deploy to VPS
+    name: Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
     runs-on: ubuntu-latest
-    needs: backend
 
     steps:
       - name: Deploy via SSH
@@ -52,20 +58,9 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ secrets.PORT }}
           script: |
-            set -e
-
-            APP_DIR="/home/ubuntu/app"
-
-            if [ ! -d "$APP_DIR/.git" ]; then
-              echo "Repo not found, cloning..."
-              rm -rf "$APP_DIR"
-              git clone https://github.com/${{ github.repository }}.git "$APP_DIR"
-            fi
-
-            cd "$APP_DIR"
-
-            git fetch origin main
-            git reset --hard origin/main
-
-            docker compose up -d --build --remove-orphans
+            cd /var/www/app
+            git pull
+            npm install
+            pm2 restart all
