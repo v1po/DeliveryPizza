@@ -62,3 +62,5 @@ ignore = [
     "E501",
     "B008",
 ]
+[tool.setuptools.packages.find]
+where = ["src"]
