@@ -1,2 +1,16 @@
-- name: Debug VM_HOST
-  run: echo "HOST=${{ secrets.VM_HOST }}"
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  debug:
+    name: Debug Secrets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Debug VM_HOST
+        run: echo "HOST=${{ secrets.VM_HOST }}"
