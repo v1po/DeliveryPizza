@@ -2,7 +2,6 @@
 Service proxy for routing requests to microservices.
 """
 
-
 import httpx
 from fastapi import Request, Response
 

@@ -2,7 +2,6 @@
 HTTP client for inter-service communication.
 """
 
-
 import httpx
 
 

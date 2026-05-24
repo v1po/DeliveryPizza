@@ -4,9 +4,10 @@ Order API routes.
 
 import sys
 from datetime import datetime
-from shared.schemas import UserRole
 
 from fastapi import APIRouter, Depends, Query, status
+
+from shared.schemas import UserRole
 
 from .dependencies import (
     CurrentUser,
@@ -317,4 +318,3 @@ async def get_statistics(
         date_to=date_to,
     )
     return ResponseWrapper(data=stats)
-
