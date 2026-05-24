@@ -1,5 +1,11 @@
 import sys
+from pathlib import Path
 from unittest.mock import AsyncMock
+
+backend_root = Path(__file__).resolve().parents[1]
+backend_src = backend_root / "src"
+if str(backend_src) not in sys.path:
+    sys.path.insert(0, str(backend_src))
 
 import pytest
 
@@ -24,7 +30,7 @@ def patch_app_sys_path(monkeypatch):
     class BackendPathList(list):
         def insert(self, index, path):
             if path == "/app":
-                path = backend_root
+                path = backend_src
             super().insert(index, path)
 
     monkeypatch.setattr(sys, "path", BackendPathList(sys.path))

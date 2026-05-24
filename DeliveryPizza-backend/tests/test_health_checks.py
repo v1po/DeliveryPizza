@@ -11,7 +11,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_service_app(service_name: str):
-    service_root = BACKEND_ROOT / "services" / service_name
+    service_root = BACKEND_ROOT / "src" / "services" / service_name
     app_dir = service_root / "app"
     package_name = f"{service_name}_app"
     module_name = f"{package_name}.main"
