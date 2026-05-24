@@ -58,3 +58,22 @@ jobs:
           done
       - name: Build frontend image
         run: docker build -t deliverypizza-frontend ./DeliveryPizza-frontend
+    deploy:
+    name: Deploy to VM
+    runs-on: self-hosted
+    needs: docker-build
+
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy application
+        run: |
+          cd /opt/deliverypizza
+
+          git pull origin main
+
+          docker compose down
+
+          docker compose up -d --build
