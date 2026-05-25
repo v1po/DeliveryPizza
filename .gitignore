@@ -65,3 +65,6 @@ coverage/
 
 # Frontend assets
 public/pizza.json
+
+# Environment variables
+docker-compose.override.yml
