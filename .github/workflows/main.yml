@@ -2,7 +2,8 @@ name: CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
 
 concurrency:
   group: production
@@ -40,39 +41,39 @@ jobs:
         run: pytest
 
   deploy:
-  name: Deploy
-  runs-on: self-hosted
+    name: Deploy
+    runs-on: self-hosted
 
-  needs: backend
+    needs: backend
 
-  steps:
-    - name: Deploy app
-      run: |
-        APP_DIR="/home/v1po/app"
-        REPO_URL="https://github.com/v1po/DeliveryPizza.git"
+    steps:
+      - name: Deploy app
+        run: |
+          APP_DIR="/home/v1po/app"
+          REPO_URL="https://github.com/v1po/DeliveryPizza.git"
 
-        # Если проекта нет — клонируем
-        if [ ! -d "$APP_DIR" ]; then
-          echo "Project not found. Cloning repository..."
+          # Если проекта нет — клонируем
+          if [ ! -d "$APP_DIR" ]; then
+            echo "Project not found. Cloning repository..."
 
-          git clone "$REPO_URL" "$APP_DIR"
+            git clone "$REPO_URL" "$APP_DIR"
 
-        else
-          echo "Project exists. Updating..."
+          else
+            echo "Project exists. Updating..."
+
+            cd "$APP_DIR"
+
+            git reset --hard
+            git clean -fd
+
+            git pull origin main
+
+            echo "Stopping old containers..."
+            docker compose down
+          fi
+
+          echo "Starting application..."
 
           cd "$APP_DIR"
 
-          git reset --hard
-          git clean -fd
-
-          git pull origin main
-
-          echo "Stopping old containers..."
-          docker compose down
-        fi
-
-        echo "Starting application..."
-
-        cd "$APP_DIR"
-
-        docker compose up -d --build
+          docker compose up -d --build
