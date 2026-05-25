@@ -53,8 +53,14 @@ jobs:
       - name: Set kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          cat <<EOF > ~/.kube/config
+          ${{ secrets.KUBECONFIG }}
+          EOF
           chmod 600 ~/.kube/config
+      - name: Test kubectl
+        run: |
+          kubectl config view
+          kubectl get nodes
       - name: Verify cluster access
         run: |
           kubectl config current-context
