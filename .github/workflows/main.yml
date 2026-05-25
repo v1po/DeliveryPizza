@@ -39,16 +39,11 @@ jobs:
         working-directory: ./DeliveryPizza-backend
         run: pytest
 
-  name: Deploy
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
   deploy:
+    name: Deploy
     runs-on: self-hosted
+
+    needs: backend
 
     steps:
       - uses: actions/checkout@v4
