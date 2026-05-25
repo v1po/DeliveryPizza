@@ -39,21 +39,22 @@ jobs:
         working-directory: ./DeliveryPizza-backend
         run: pytest
 
+  name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
   deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    needs: backend   # деплой только если тесты прошли
+    runs-on: self-hosted
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            cd /var/www/app
-            git pull
-            npm install
-            pm2 restart all
+      - uses: actions/checkout@v4
+
+      - name: Deploy app
+        run: |
+          cd /home/v1po/app
+          docker compose down
+          docker compose up -d --build
