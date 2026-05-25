@@ -53,7 +53,7 @@ jobs:
           REPO_URL="https://github.com/v1po/DeliveryPizza.git"
 
           # Если проекта нет — клонируем
-          if [ ! -d "$APP_DIR" ]; then
+          if [ ! -d "$APP_DIR/.git" ]; then
             echo "Project not found. Cloning repository..."
 
             git clone "$REPO_URL" "$APP_DIR"
