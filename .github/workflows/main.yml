@@ -40,55 +40,58 @@ jobs:
         working-directory: ./DeliveryPizza-backend
         run: pytest
 
-  deploy:
-    name: Deploy
-    runs-on: self-hosted
 
+  deploy:
+    name: Deploy to k3s + ngrok
+    runs-on: self-hosted
     needs: backend
 
     steps:
-      - name: Deploy app
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f app/k8s/
+
+      - name: Restart services
+        run: |
+          kubectl rollout restart deployment auth -n deliverypizza || true
+          kubectl rollout restart deployment catalog -n deliverypizza || true
+          kubectl rollout restart deployment order -n deliverypizza || true
+          kubectl rollout restart deployment gateway -n deliverypizza || true
+          kubectl rollout restart deployment frontend -n deliverypizza || true
+
+      - name: Wait rollout
+        run: |
+          kubectl rollout status deployment/frontend -n deliverypizza
+
+
+  ngrok:
+    name: Start ngrok tunnel
+    runs-on: self-hosted
+    needs: deploy
+
+    steps:
+      - name: Start ngrok (frontend NodePort)
         env:
           NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
-
         run: |
-          APP_DIR="/home/v1po/app"
-          REPO_URL="https://github.com/v1po/DeliveryPizza.git"
+          nohup ngrok config add-authtoken $NGROK_AUTHTOKEN
+          nohup ngrok http 31405 > ngrok.log 2>&1 &
 
-          if [ ! -d "$APP_DIR/.git" ]; then
-            echo "Project not found. Cloning repository..."
-
-            git clone "$REPO_URL" "$APP_DIR"
-
-          else
-            echo "Project exists. Updating..."
-
-            cd "$APP_DIR"
-
-            git reset --hard
-            git clean -fd
-
-            git pull origin main
-
-            echo "Stopping old containers..."
-            docker compose down
-          fi
-
-          echo "Starting application..."
-
-          cd "$APP_DIR"
-
-          docker compose up -d --build
-
-      - name: Wait ngrok
-        run: sleep 10
+          sleep 5
 
       - name: Show public URL
         run: |
           URL=$(curl -s http://127.0.0.1:4040/api/tunnels \
             | jq -r '.tunnels[0].public_url')
 
-          echo ""
           echo "======================================"
           echo "APP URL: $URL"
           echo "======================================"
