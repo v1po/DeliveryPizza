@@ -48,6 +48,9 @@ jobs:
 
     steps:
       - name: Deploy app
+        env:
+          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+
         run: |
           APP_DIR="/home/v1po/app"
           REPO_URL="https://github.com/v1po/DeliveryPizza.git"
@@ -77,33 +80,8 @@ jobs:
 
           docker compose up -d --build
 
-      - name: Install ngrok
-        run: |
-          if ! command -v ngrok &> /dev/null; then
-            curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
-              | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-
-            echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
-              | sudo tee /etc/apt/sources.list.d/ngrok.list
-
-            sudo apt update
-            sudo apt install ngrok -y
-          fi
-
-      - name: Configure ngrok
-        run: |
-          ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
-
-      - name: Kill old ngrok
-        run: |
-          pkill ngrok || true
-
-      - name: Start ngrok
-        run: |
-          nohup ngrok http 80 > /tmp/ngrok.log 2>&1 &
-
       - name: Wait ngrok
-        run: sleep 5
+        run: sleep 10
 
       - name: Show public URL
         run: |
