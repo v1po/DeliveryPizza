@@ -1,75 +1,116 @@
-deploy:
-  name: Deploy
-  runs-on: self-hosted
+name: CI/CD
 
-  needs: backend
+on:
+  push:
+    branches:
+      - main
 
-  steps:
-    - name: Deploy app
-      run: |
-        APP_DIR="/home/v1po/app"
-        REPO_URL="https://github.com/v1po/DeliveryPizza.git"
+concurrency:
+  group: production
+  cancel-in-progress: true
 
-        # Если проекта нет — клонируем
-        if [ ! -d "$APP_DIR/.git" ]; then
-          echo "Project not found. Cloning repository..."
+jobs:
+  backend:
+    name: Backend lint + tests
+    runs-on: ubuntu-latest
 
-          git clone "$REPO_URL" "$APP_DIR"
+    steps:
+      - uses: actions/checkout@v4
 
-        else
-          echo "Project exists. Updating..."
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        working-directory: ./DeliveryPizza-backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest black ruff
+
+      - name: Lint (black + ruff)
+        working-directory: ./DeliveryPizza-backend
+        run: |
+          black --check .
+          ruff check .
+
+      - name: Run tests
+        working-directory: ./DeliveryPizza-backend
+        run: pytest
+
+  deploy:
+    name: Deploy
+    runs-on: self-hosted
+
+    needs: backend
+
+    steps:
+      - name: Deploy app
+        run: |
+          APP_DIR="/home/v1po/app"
+          REPO_URL="https://github.com/v1po/DeliveryPizza.git"
+
+          if [ ! -d "$APP_DIR/.git" ]; then
+            echo "Project not found. Cloning repository..."
+
+            git clone "$REPO_URL" "$APP_DIR"
+
+          else
+            echo "Project exists. Updating..."
+
+            cd "$APP_DIR"
+
+            git reset --hard
+            git clean -fd
+
+            git pull origin main
+
+            echo "Stopping old containers..."
+            docker compose down
+          fi
+
+          echo "Starting application..."
 
           cd "$APP_DIR"
 
-          git reset --hard
-          git clean -fd
+          docker compose up -d --build
 
-          git pull origin main
+      - name: Install ngrok
+        run: |
+          if ! command -v ngrok &> /dev/null; then
+            curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+              | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
 
-          echo "Stopping old containers..."
-          docker compose down
-        fi
+            echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
+              | sudo tee /etc/apt/sources.list.d/ngrok.list
 
-        echo "Starting application..."
+            sudo apt update
+            sudo apt install ngrok -y
+          fi
 
-        cd "$APP_DIR"
+      - name: Configure ngrok
+        run: |
+          ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
 
-        docker compose up -d --build
+      - name: Kill old ngrok
+        run: |
+          pkill ngrok || true
 
-    - name: Install ngrok
-      run: |
-        if ! command -v ngrok &> /dev/null; then
-          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
-            | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+      - name: Start ngrok
+        run: |
+          nohup ngrok http 80 > /tmp/ngrok.log 2>&1 &
 
-          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" \
-            | sudo tee /etc/apt/sources.list.d/ngrok.list
+      - name: Wait ngrok
+        run: sleep 5
 
-          sudo apt update
-          sudo apt install ngrok -y
-        fi
+      - name: Show public URL
+        run: |
+          URL=$(curl -s http://127.0.0.1:4040/api/tunnels \
+            | jq -r '.tunnels[0].public_url')
 
-    - name: Configure ngrok
-      run: |
-        ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
-
-    - name: Kill old ngrok
-      run: |
-        pkill ngrok || true
-
-    - name: Start ngrok
-      run: |
-        nohup ngrok http 80 > /tmp/ngrok.log 2>&1 &
-
-    - name: Wait ngrok
-      run: sleep 5
-
-    - name: Show public URL
-      run: |
-        URL=$(curl -s http://127.0.0.1:4040/api/tunnels \
-          | jq -r '.tunnels[0].public_url')
-
-        echo ""
-        echo "======================================"
-        echo "APP URL: $URL"
-        echo "======================================"
+          echo ""
+          echo "======================================"
+          echo "APP URL: $URL"
+          echo "======================================"
