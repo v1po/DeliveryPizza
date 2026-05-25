@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: deliverypizza
+spec:
+  selector:
+    app: order
+  ports:
+  - port: 8080
+    targetPort: 8080
