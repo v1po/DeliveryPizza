@@ -40,16 +40,39 @@ jobs:
         run: pytest
 
   deploy:
-    name: Deploy
-    runs-on: self-hosted
+  name: Deploy
+  runs-on: self-hosted
 
-    needs: backend
+  needs: backend
 
-    steps:
-      - uses: actions/checkout@v4
+  steps:
+    - name: Deploy app
+      run: |
+        APP_DIR="/home/v1po/app"
+        REPO_URL="https://github.com/v1po/DeliveryPizza.git"
 
-      - name: Deploy app
-        run: |
-          cd /home/v1po/app
+        # Если проекта нет — клонируем
+        if [ ! -d "$APP_DIR" ]; then
+          echo "Project not found. Cloning repository..."
+
+          git clone "$REPO_URL" "$APP_DIR"
+
+        else
+          echo "Project exists. Updating..."
+
+          cd "$APP_DIR"
+
+          git reset --hard
+          git clean -fd
+
+          git pull origin main
+
+          echo "Stopping old containers..."
           docker compose down
-          docker compose up -d --build
+        fi
+
+        echo "Starting application..."
+
+        cd "$APP_DIR"
+
+        docker compose up -d --build
